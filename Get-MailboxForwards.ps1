@@ -20,35 +20,35 @@ param (
 
 Add-PSSnapin Microsoft.Exchange.Management.PowerShell.SnapIn
 
-$Mbx = Get-Mailbox $Mailbox
+$mbx = Get-Mailbox $mailbox
 
-$ForwardingRules = $null
-$Rules = Get-InboxRule -Mailbox $Mbx.Name
+$forwardingRules = $null
+$rules = Get-InboxRule -Mailbox $mbx.Name
 
 # Retrieve inbox rules that forward
-$ForwardingRules = $Rules | Where-Object { $_.ForwardTo -or $_.ForwardAsAttachmentTo }
-$NumberOfForwardingRules = $ForwardingRules | Measure-Object
+$forwardingRules = $rules | Where-Object { $_.ForwardTo -or $_.ForwardAsAttachmentTo }
+$numberOfForwardingRules = $forwardingRules | Measure-Object
 
-if ($NumberOfForwardingRules.Count -gt 0) {
-    foreach ($Rule in $ForwardingRules) {
-        $RuleHash = $null
+if ($numberOfForwardingRules.Count -gt 0) {
+    foreach ($rule in $forwardingRules) {
+        $ruleHash = $null
 
-        $RuleHash = [Ordered]@{
-            DisplayName                = $Mbx.DisplayName
-            PrimarySmtpAddress         = $Mbx.PrimarySmtpAddress
-            ForwardingAddress          = $Mbx.ForwardingAddress
-            ForwardingSmtpAddress      = $Mbx.ForwardingSmtpAddress
-            DeliverToMailboxAndForward = $Mbx.DeliverToMailboxAndForward
-            RuleId                     = $Rule.Identity
-            RuleName                   = $Rule.Name
-            RuleEnabled                = $Rule.Enabled
-            RuleDescription            = $Rule.Description
+        $ruleHash = [Ordered]@{
+            DisplayName                = $mbx.DisplayName
+            PrimarySmtpAddress         = $mbx.PrimarySmtpAddress
+            ForwardingAddress          = $mbx.ForwardingAddress
+            ForwardingSmtpAddress      = $mbx.ForwardingSmtpAddress
+            DeliverToMailboxAndForward = $mbx.DeliverToMailboxAndForward
+            RuleId                     = $rule.Identity
+            RuleName                   = $rule.Name
+            RuleEnabled                = $rule.Enabled
+            RuleDescription            = $rule.Description
         }
         
-        $RuleObject = New-Object PSObject -Property $RuleHash
-        $RuleObject
+        $ruleObject = New-Object PSObject -Property $ruleHash
+        $ruleObject
     }
 } else {
     # No rules just output ForwardingAddress, ForwardingSmtpAddress, and DeliverToMailboxAndForward only.
-    $Mbx | Select DisplayName,PrimarySmtpAddress,ForwardingAddress,ForwardingSmtpAddress,DeliverToMailboxAndForward
+    $mbx | Select DisplayName,PrimarySmtpAddress,ForwardingAddress,ForwardingSmtpAddress,DeliverToMailboxAndForward
 }

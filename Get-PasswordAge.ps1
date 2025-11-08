@@ -31,14 +31,14 @@ param (
     [switch]$ExcludeDisabledUsers = $false
 )
 
-$Properties =
+$properties =
     "LastLogonTimestamp",
     "PwdLastSet",
     "PasswordNeverExpires",
     "Mail",
     "PasswordExpired"
 
-$SelectProperties =
+$selectProperties =
     "Name",
     @{Name="Last Logon"; Expression={ ([datetime]::FromFileTime($_.LastLogonTimeStamp)) }},
     "Mail",
@@ -50,34 +50,34 @@ $SelectProperties =
     "Enabled"
 
 function CalcPwdAge($LastSet) {
-    $TimeSpan = New-TimeSpan -Start ([datetime]::FromFileTime($LastSet)) -End (Get-Date).DateTime
-    return $TimeSpan.Days
+    $timeSpan = New-TimeSpan -Start ([datetime]::FromFileTime($LastSet)) -End (Get-Date).DateTime
+    return $timeSpan.Days
 }
 
 #
-if ($CmdUsers.Count) {
-    $Users = $CmdUsers | Get-ADUser -Properties $Properties
+if ($cmdUsers.Count) {
+    $users = $CmdUsers | Get-ADUser -Properties $properties
 } else {
-    $Users = Get-ADUser -Filter * -Properties $Properties
+    $users = Get-ADUser -Filter * -Properties $properties
 }
 
-# Check for accounts with passwords last set within $Days
-if ($Days -gt 0) {
-    $Users = $Users | Where-Object { (New-TimeSpan -Start ([datetime]::FromFileTime($_.pwdLastSet)) -End (Get-Date).DateTime).Days -le $Days }
+# Check for accounts with passwords last set within $days
+if ($days -gt 0) {
+    $users = $users | Where-Object { (New-TimeSpan -Start ([datetime]::FromFileTime($_.pwdLastSet)) -End (Get-Date).DateTime).Days -le $days }
 }
 
 # Include accounts that don't expire?
-if ($ExcludeNeverExpires.IsPresent) {
-    $Users = $Users | Where-Object { $_.PasswordNeverExpires -eq $false }
+if ($excludeNeverExpires.IsPresent) {
+    $users = $users | Where-Object { $_.PasswordNeverExpires -eq $false }
 }
 
 # Sort results by last password set date
-$Users = $Users | Sort PwdLastSet
+$users = $users | Sort PwdLastSet
 
 # Limit results
-if ($LastResults) {
-    $Users = $Users | Select-Object -First $LastResults
+if ($lastResults) {
+    $users = $users | Select-Object -First $lastResults
 }
 
 # Output
-$Users | Select $SelectProperties
+$users | Select $selectProperties
