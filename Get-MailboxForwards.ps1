@@ -20,7 +20,7 @@ param (
 
 Add-PSSnapin Microsoft.Exchange.Management.PowerShell.SnapIn
 
-$mbx = Get-Mailbox $mailbox
+$mbx = Get-Mailbox $Mailbox
 
 $forwardingRules = $null
 $rules = Get-InboxRule -Mailbox $mbx.Name
