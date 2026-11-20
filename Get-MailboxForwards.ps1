@@ -50,5 +50,11 @@ if ($numberOfForwardingRules.Count -gt 0) {
     }
 } else {
     # No rules just output ForwardingAddress, ForwardingSmtpAddress, and DeliverToMailboxAndForward only.
-    $mbx | Select DisplayName,PrimarySmtpAddress,ForwardingAddress,ForwardingSmtpAddress,DeliverToMailboxAndForward
+    $selectProperties = 
+        "DisplayName",
+        "PrimarySmtpAddress",
+        "ForwardingAddress",
+        "ForwardingSmtpAddress",
+        "DeliverToMailboxAndForward"
+    $mbx | Select-Object $selectProperties
 }

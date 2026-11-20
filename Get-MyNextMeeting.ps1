@@ -23,6 +23,7 @@
     Author        : Jonathan Cormier
     Prerequisite  : ExchangeOnlineManagement Module
     Created       : December 5, 2024
+    Modified:     : November 20, 2026
 #>
 [CmdletBinding()]
 param(
@@ -40,22 +41,21 @@ function Test-ExchangeOnlineConnection {
   try {
     # Check if module is installed
     if (!(Get-Module -ListAvailable -Name ExchangeOnlineManagement)) {
-	return $false
+      return $false
     }
 
     # Check if module is imported in current session
     if (!(Get-Module ExchangeOnlineManagement)) {
-	return $false
+      return $false
     }
 
     # Check connection status
     if (!((Get-ConnectionInformation).State -eq 'Connected')) {
-	return $false
+      return $false
     }
 
     return $true
-  }
-  catch {
+  } catch {
     return $false
   }
 }
@@ -118,7 +118,7 @@ try {
       'Organizer',
       'Location'
     )
-  
+
   # Output next hellscape
   if ($nextMeeting) {
     $beginsText = Get-TimeUntil -FutureTime $nextMeeting.Start

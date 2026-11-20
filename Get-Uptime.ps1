@@ -27,9 +27,7 @@ param(
 
 begin {
   function Out-Object {
-    param(
-      [System.Collections.Hashtable[]] $HashData
-    )
+    param([System.Collections.Hashtable[]] $HashData)
     
     $order = @()
     $result = @{}
@@ -50,28 +48,28 @@ begin {
   function Get-Uptime {
     param(
       $ComputerName,
-      $Credential
+      [System.Management.Automation.PSCredential] $Credential
     )
 
     # In case pipeline input contains ComputerName property
     if ($ComputerName.ComputerName) {
-      $computerName = $ComputerName.ComputerName
+      $name = $ComputerName.ComputerName
     }
 
-    if ((-not $computerName) -or ($computerName -eq ".")) {
-      $computerName = [Net.Dns]::GetHostName()
+    if ((-not $name) -or ($name -eq ".")) {
+      $name = [Net.Dns]::GetHostName()
     }
 
     $params = @{
       "Class" = "Win32_OperatingSystem"
-      "ComputerName" = $computerName
+      "ComputerName" = $name
       "Namespace" = "root\CIMV2"
     }
 
-    if ($credential) {
+    if ($Credential) {
       # Ignore -Credential for current computer
-      if ($computerName -ne [Net.Dns]::GetHostName()) {
-        $params.Add("Credential", $credential)
+      if ($name -ne [Net.Dns]::GetHostName()) {
+        $params.Add("Credential", $Credential)
       }
     }
 
@@ -88,7 +86,7 @@ begin {
     $lastBootTime = [Management.ManagementDateTimeConverter]::ToDateTime($wmiOS.LastBootUpTime)
     
     Out-Object `
-      @{"ComputerName" = $computerName},
+      @{"ComputerName" = $name},
       @{"LastBootTime" = $lastBootTime},
       @{"Uptime"       = (Get-Date) - $lastBootTime | Format-TimeSpan}
   }
@@ -96,8 +94,8 @@ begin {
 
 process {
   if ($ComputerName) {
-    foreach ($computerNameItem in $ComputerName) {
-      Get-Uptime $computerNameItem $Credential
+    foreach ($name in $ComputerName) {
+      Get-Uptime $name $Credential
     }
   }
   else {

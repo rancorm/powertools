@@ -12,7 +12,7 @@ param (
 )
 
 function Recursive($GPOName, $KeyPath) {
-    if ($KeyPath -eq $null) {
+    if ($null -eq $KeyPath) {
         Return
     }
 
@@ -30,12 +30,12 @@ function Recursive($GPOName, $KeyPath) {
 
 $nearestDC = (Get-ADDomainController -Discover -NextClosestSite).Name
 
-# Get a list of GPOs from the domain
-$GPOs = Get-GPO -All -Domain $Domain -Server $nearestDC | sort DisplayName
+# Get a list of GPO policies from the domain
+$policies = Get-GPO -All -Domain $Domain -Server $nearestDC | sort DisplayName
 
 # Go through each GPO and check for keys and values
-foreach ($GPO in $GPOs)  {
+foreach ($policy in $policies)  {
     $localMachineKeyPath = "HKLM\Software\"
 
-    Recursive $GPO.DisplayName $localMachineKeyPath
+    Recursive $policy.DisplayName $localMachineKeyPath
 }
