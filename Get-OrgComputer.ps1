@@ -40,7 +40,7 @@ Write-Host "Computer Organization Information:" $Args -NoNewline
 
 $foundComputers = foreach ($orgComputer in $Args) {
     $computers = Get-ADComputer -Filter { Name -like $orgComputer } -Properties $properties
-    $computers | Select -Property $selectProperties
+    $computers | Select-Object -Property $selectProperties
 }
 
 # Output to grid or console
