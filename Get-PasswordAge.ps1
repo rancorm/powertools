@@ -51,23 +51,29 @@ $selectProperties =
 
 function CalcPwdAge($LastSet) {
     $timeSpan = New-TimeSpan -Start ([datetime]::FromFileTime($LastSet)) -End (Get-Date).DateTime
+
     return $timeSpan.Days
 }
 
-#
-if ($cmdUsers.Count) {
+# Process pipeline or do all users
+if ($CmdUsers.Count) {
     $users = $CmdUsers | Get-ADUser -Properties $properties
 } else {
     $users = Get-ADUser -Filter * -Properties $properties
 }
 
 # Check for accounts with passwords last set within $days
-if ($days -gt 0) {
-    $users = $users | Where-Object { (New-TimeSpan -Start ([datetime]::FromFileTime($_.pwdLastSet)) -End (Get-Date).DateTime).Days -le $days }
+if ($Days -gt 0) {
+    $users = $users | Where-Object {
+        $startCheck = ([datetime]::FromFileTime($_.pwdLastSet))
+        $endCheck = (Get-Date).DateTime.Days
+        $checkSpan = New-TimeSpan -Start $startCheck -End $endCheck -le $Days
+        $checkSpan
+    }
 }
 
 # Include accounts that don't expire?
-if ($excludeNeverExpires.IsPresent) {
+if ($ExcludeNeverExpires.IsPresent) {
     $users = $users | Where-Object { $_.PasswordNeverExpires -eq $false }
 }
 
@@ -75,9 +81,9 @@ if ($excludeNeverExpires.IsPresent) {
 $users = $users | Sort PwdLastSet
 
 # Limit results
-if ($lastResults) {
-    $users = $users | Select-Object -First $lastResults
+if ($LastResults) {
+    $users = $users | Select-Object -First $LastResults
 }
 
 # Output
-$users | Select $selectProperties
+$users | Select-Object $selectProperties
